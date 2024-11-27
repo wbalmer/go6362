@@ -118,11 +118,11 @@ for i in range(n_layers+1):
 # A 'free retrieval' would have each line species as a parameter
 # Using a (dis)equilibrium model, we only supply bulk parameters.
 # Carbon quench pressure
-# retrieval_config.add_parameter(
-#     'log_pquench',
-#     True,
-#     transform_prior_cube_coordinate=lambda x : -6.0 + 9.0 * x
-#     )
+retrieval_config.add_parameter(
+    'log_pquench',
+    True,
+    transform_prior_cube_coordinate=lambda x : -6.0 + 9.0 * x
+    )
 # Metallicity [Fe/H]
 retrieval_config.add_parameter(
     'Fe/H',
