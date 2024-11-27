@@ -98,10 +98,9 @@ n_layers = 7
 retrieval_config.add_parameter('nnodes', False, value = n_layers)
 retrieval_config.add_parameter('log_prior_weight', False, value = -0.572)
 
-
 retrieval_config.add_parameter('gamma', True,
                                transform_prior_cube_coordinate = \
-                               lambda x : inverse_gamma_prior(x+1e-10, 1, 5e-5))
+                               lambda x : inverse_gamma_prior( (5e-5 + (1-5e-5) * x), 1, 5e-5))
 
 retrieval_config.add_parameter('T0',
                                True,
@@ -169,7 +168,7 @@ retrieval_config.set_line_species(
         'H2O',
         '12CO',
         '13CO',
-        'C18O',
+        '12C-18O',
         # '13C16O'
         # '12C-17O'
         # 'H2O__POKAZATEL.R1e6',
@@ -192,7 +191,8 @@ retrieval_config.set_line_species(
 
 retrieval_config.add_cloud_species('Fe(s)_crystalline__DHS', eq=True, abund_lim=(-3.5, 1.0))
 retrieval_config.add_cloud_species('MgSiO3(s)_crystalline__DHS', eq=True, abund_lim=(-3.5, 1.0))
-retrieval_config.add_cloud_species('Al2O3(s)_crystalline__DHS', eq=True, abund_lim=(-3.5, 1.0))
+# retrieval_config.add_cloud_species('Al2O3(s)_crystalline__DHS', eq=True, abund_lim=(-3.5, 1.0))
+# retrieval_config.add_cloud_species('Al2O3(s)_crystalline__Mie', eq=True, abund_lim=(-3.5, 1.0))
 
 # add isotope as freely retrieved so we can do the ratio
 retrieval_config.add_parameter(
@@ -208,7 +208,7 @@ retrieval_config.add_parameter(
 )
 
 retrieval_config.add_parameter(
-    'C18O',
+    '12C-18O',
     True,
     transform_prior_cube_coordinate=lambda x : -10. + 10 * x
 )
@@ -245,8 +245,8 @@ retrieval_config.parameters['12CO'].plot_in_corner = True
 retrieval_config.parameters['12CO'].corner_label = r"$^{12}CO$"
 retrieval_config.parameters['13CO'].plot_in_corner = True
 retrieval_config.parameters['13CO'].corner_label = r"$^{13}CO$"
-retrieval_config.parameters['C18O'].plot_in_corner = True
-retrieval_config.parameters['C18O'].corner_label = r"$C^{18}O$"
+retrieval_config.parameters['12C-18O'].plot_in_corner = True
+retrieval_config.parameters['12C-18O'].corner_label = r"$C^{18}O$"
 
 retrieval_config.parameters['NIRSPEC_G395H_HPF_radvel'].plot_in_corner = True
 retrieval_config.parameters['NIRSPEC_G395H_HPF_radvel'].corner_label = "RV_bd"
@@ -287,13 +287,14 @@ retrieval = Retrieval(
 
 
 run_retrieval = True
+resume = False
 
 if run_retrieval:
     retrieval.run(
         n_live_points=100,
         sampling_efficiency=0.25,
         const_efficiency_mode=True,
-        resume=False,
+        resume=resume,
         seed=-1  # ⚠️ seed should be removed or set to -1 in a real retrieval, it is added here for reproducibility
     )
 

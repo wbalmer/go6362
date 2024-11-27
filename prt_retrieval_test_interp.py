@@ -98,10 +98,9 @@ n_layers = 7
 retrieval_config.add_parameter('nnodes', False, value = n_layers)
 retrieval_config.add_parameter('log_prior_weight', False, value = -0.572)
 
-
 retrieval_config.add_parameter('gamma', True,
                                transform_prior_cube_coordinate = \
-                               lambda x : inverse_gamma_prior(x+1e-10, 1, 5e-5))
+                               lambda x : inverse_gamma_prior( (5e-5 + (1-5e-5) * x), 1, 5e-5))
 
 retrieval_config.add_parameter('T0',
                                True,
@@ -191,7 +190,8 @@ retrieval_config.set_line_species(
 
 retrieval_config.add_cloud_species('Fe(s)_crystalline__DHS', eq=True, abund_lim=(-3.5, 1.0))
 retrieval_config.add_cloud_species('MgSiO3(s)_crystalline__DHS', eq=True, abund_lim=(-3.5, 1.0))
-retrieval_config.add_cloud_species('Al2O3(s)_crystalline__DHS', eq=True, abund_lim=(-3.5, 1.0))
+# retrieval_config.add_cloud_species('Al2O3(s)_crystalline__DHS', eq=True, abund_lim=(-3.5, 1.0))
+# retrieval_config.add_cloud_species('Al2O3(s)_crystalline__Mie', eq=True, abund_lim=(-3.5, 1.0))
 
 # add isotope as freely retrieved so we can do the ratio
 retrieval_config.add_parameter(
@@ -278,13 +278,14 @@ retrieval = Retrieval(
 
 
 run_retrieval = True
+resume = False
 
 if run_retrieval:
     retrieval.run(
         n_live_points=100,
         sampling_efficiency=0.25,
         const_efficiency_mode=True,
-        resume=False,
+        resume=resume,
         seed=-1  # ⚠️ seed should be removed or set to -1 in a real retrieval, it is added here for reproducibility
     )
 
