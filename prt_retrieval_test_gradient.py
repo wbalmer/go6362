@@ -6,6 +6,10 @@ import os
 # To not have numpy start parallelizing on its own
 os.environ["OMP_NUM_THREADS"] = "1"
 
+# for rockfish 
+import sys
+sys.setdlopenflags(os.RTLD_NOW | os.RTLD_GLOBAL)
+
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -180,6 +184,7 @@ retrieval_config.set_line_species(
         'H2O',
         '12CO',
         '13CO',
+        '12C-18O',
         # '13C16O'
         # '12C-17O'
         # 'H2O__POKAZATEL.R1e6',
@@ -191,11 +196,11 @@ retrieval_config.set_line_species(
         'FeH',
         'NH3',
         'PH3',
-        # 'Na',
-        # 'K',
-        # 'TiO',
-        # 'VO',
-        # 'SiO'
+        'Na',
+        'K',
+        'TiO',
+        'VO',
+        'SiO'
     ],
     eq = True
 )
@@ -212,6 +217,12 @@ retrieval_config.add_parameter(
 
 retrieval_config.add_parameter(
     '13CO',
+    True,
+    transform_prior_cube_coordinate=lambda x : -10. + 10 * x
+)
+
+retrieval_config.add_parameter(
+    '12C-18O',
     True,
     transform_prior_cube_coordinate=lambda x : -10. + 10 * x
 )
@@ -248,6 +259,8 @@ retrieval_config.parameters['12CO'].plot_in_corner = True
 retrieval_config.parameters['12CO'].corner_label = r"$^{12}CO$"
 retrieval_config.parameters['13CO'].plot_in_corner = True
 retrieval_config.parameters['13CO'].corner_label = r"$^{13}CO$"
+retrieval_config.parameters['12C-18O'].plot_in_corner = True
+retrieval_config.parameters['12C-18O'].corner_label = r"$C^{18}O$"
 
 retrieval_config.parameters['NIRSPEC_G395H_HPF_radvel'].plot_in_corner = True
 retrieval_config.parameters['NIRSPEC_G395H_HPF_radvel'].corner_label = "RV_bd"
@@ -291,14 +304,14 @@ run_retrieval = True
 
 if run_retrieval:
     retrieval.run(
-        n_live_points=100,
-        sampling_efficiency=0.25,
+        n_live_points=960,
+        sampling_efficiency=0.05,
         const_efficiency_mode=True,
-        resume=True,
+        resume=False,
         seed=-1  # ⚠️ seed should be removed or set to -1 in a real retrieval, it is added here for reproducibility
     )
 
-plot = True
+plot = False
 
 if plot:
     retrieval.plot_all(contribution=True)

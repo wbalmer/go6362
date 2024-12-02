@@ -19,14 +19,14 @@ from petitRADTRANS import physical_constants as cst
 # Import the class used to set up the retrieval.
 from petitRADTRANS.retrieval import Retrieval,RetrievalConfig
 # Import Prior functions, if necessary.
-from petitRADTRANS.retrieval.utils import gaussian_prior, inverse_gamma_prior
+from petitRADTRANS.retrieval.utils import gaussian_prior
 # Import atmospheric model function
-from petitRADTRANS.retrieval.models import emission_model_diseq, gradient_profile_emission, interpolated_profile_emission
+from petitRADTRANS.retrieval.models import emission_model_diseq, gradient_profile_emission
 
 
 # Define the pRT run setup
 retrieval_config = RetrievalConfig(
-    retrieval_name="HD984B_test_interp_manyiso", # give a useful name for your retrieval
+    retrieval_name="HD984B_test", # give a useful name for your retrieval
     run_mode="retrieve",  # 'retrieve' to run, or 'evaluate' to make plots
     amr=True,  # adaptive mesh refinement, slower if True
     scattering_in_emission=True  #  add scattering for emission spectra clouds
@@ -40,7 +40,7 @@ retrieval_config.add_data(
     path_to_data+"hd984B_nirspec_nonans.txt",
     data_resolution=5000,
     model_resolution=10000,
-    model_generating_function = interpolated_profile_emission,
+    model_generating_function = gradient_profile_emission,
     resample=True,
     filters=True,
     radvel=True,
@@ -98,25 +98,37 @@ retrieval_config.add_parameter(
     transform_prior_cube_coordinate=lambda x : ( 200 + 2800 * x)
 )
 
-n_layers = 7
-retrieval_config.add_parameter('nnodes', False, value = n_layers)
-retrieval_config.add_parameter('log_prior_weight', False, value = -0.572)
+n_layers = 6
+retrieval_config.add_parameter('N_layers', False, value = n_layers)
+retrieval_config.add_parameter('T_bottom', True,
+                            transform_prior_cube_coordinate = \
+                            lambda x : 2000.0 + 20000.0*x)
 
-retrieval_config.add_parameter('gamma', True,
-                               transform_prior_cube_coordinate = \
-                               lambda x : inverse_gamma_prior( (5e-5 + (1-5e-5) * x), 1, 5e-5))
-
-retrieval_config.add_parameter('T0',
-                               True,
-                               transform_prior_cube_coordinate = \
-                               lambda x : (0 + 900 * x)
-                               )
-
-for i in range(n_layers+1):
-    retrieval_config.add_parameter(f'T{i+1}',
-                                   True,
-                                   transform_prior_cube_coordinate = \
-                                   lambda x : (300 + 27000 * x))
+#dts = [0.07,0.10,0.18,0.27,0.24,0.25]
+retrieval_config.add_parameter(f'PTslope_1',
+                            True,
+                            transform_prior_cube_coordinate = \
+                                lambda x : gaussian_prior(x,0.25,0.025))
+retrieval_config.add_parameter(f'PTslope_2',
+                            True,
+                            transform_prior_cube_coordinate = \
+                                lambda x : gaussian_prior(x,0.25,0.045))
+retrieval_config.add_parameter(f'PTslope_3',
+                            True,
+                            transform_prior_cube_coordinate = \
+                                lambda x : gaussian_prior(x,0.26,0.05))
+retrieval_config.add_parameter(f'PTslope_4',
+                            True,
+                            transform_prior_cube_coordinate = \
+                                lambda x : gaussian_prior(x,0.2,0.05))
+retrieval_config.add_parameter(f'PTslope_5',
+                            True,
+                            transform_prior_cube_coordinate = \
+                                lambda x : gaussian_prior(x,0.12,0.045))
+retrieval_config.add_parameter(f'PTslope_6',
+                            True,
+                            transform_prior_cube_coordinate = \
+                                lambda x : gaussian_prior(x,0.07,0.07))
 
 # Chemistry
 # A 'free retrieval' would have each line species as a parameter
@@ -184,19 +196,17 @@ retrieval_config.set_line_species(
         'FeH',
         'NH3',
         'PH3',
-        # 'Na',
-        # 'K',
-        # 'TiO',
-        # 'VO',
-        # 'SiO'
+        'Na',
+        'K',
+        'TiO',
+        'VO',
+        'SiO'
     ],
     eq = True
 )
 
 retrieval_config.add_cloud_species('Fe(s)_crystalline__DHS', eq=True, abund_lim=(-3.5, 1.0))
 retrieval_config.add_cloud_species('MgSiO3(s)_crystalline__DHS', eq=True, abund_lim=(-3.5, 1.0))
-# retrieval_config.add_cloud_species('Al2O3(s)_crystalline__DHS', eq=True, abund_lim=(-3.5, 1.0))
-# retrieval_config.add_cloud_species('Al2O3(s)_crystalline__Mie', eq=True, abund_lim=(-3.5, 1.0))
 
 # add isotope as freely retrieved so we can do the ratio
 retrieval_config.add_parameter(
@@ -290,19 +300,18 @@ retrieval = Retrieval(
 )
 
 
-run_retrieval = True
-resume = True
+run_retrieval = False
 
 if run_retrieval:
     retrieval.run(
-        n_live_points=100,
-        sampling_efficiency=0.25,
+        n_live_points=960,
+        sampling_efficiency=0.05,
         const_efficiency_mode=True,
-        resume=resume,
+        resume=False,
         seed=-1  # ⚠️ seed should be removed or set to -1 in a real retrieval, it is added here for reproducibility
     )
 
-plot = True
+plot = False
 
 if plot:
     retrieval.plot_all(contribution=True)
