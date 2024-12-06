@@ -56,11 +56,20 @@ retrieval_config.add_data(
     line_opacity_mode='c-k'
 )
 
-retrieval_config.add_photometry(
-    path_to_data + 'hd13724B_sphere_phot.txt',
-    gradient_profile_emission,
-    model_resolution=40
+retrieval_config.add_data(
+    'GRAVITY',
+    path_to_data+"hd13724B_gravity_fluxcal_spectrum.fits",
+    data_resolution=500,
+    model_resolution=1000,
+    model_generating_function = gradient_profile_emission,
+    line_opacity_mode='c-k'
 )
+
+# retrieval_config.add_photometry(
+#     path_to_data + 'hd13724B_sphere_phot.txt',
+#     gradient_profile_emission,
+#     model_resolution=40
+# )
 
 # todo: add other spectra
 
@@ -171,23 +180,23 @@ retrieval_config.add_parameter(
 # Clouds
 # Based on an Ackermann-Marley (2001) cloud model
 # Width of particle size distribution
-retrieval_config.add_parameter(
-    'sigma_lnorm',
-    True,
-    transform_prior_cube_coordinate=lambda x : 1.05 + 1.95 * x
-)
-# Vertical mixing parameters
-retrieval_config.add_parameter(
-    'log_kzz',
-    True,
-    transform_prior_cube_coordinate=lambda x : 5.0 + 8.0 * x
-)
-# Sedimentation parameter
-retrieval_config.add_parameter(
-    'fsed',
-    True,
-    transform_prior_cube_coordinate=lambda x : 1.0 + 10.0 * x
-)
+# retrieval_config.add_parameter(
+#     'sigma_lnorm',
+#     True,
+#     transform_prior_cube_coordinate=lambda x : 1.05 + 1.95 * x
+# )
+# # Vertical mixing parameters
+# retrieval_config.add_parameter(
+#     'log_kzz',
+#     True,
+#     transform_prior_cube_coordinate=lambda x : 5.0 + 8.0 * x
+# )
+# # Sedimentation parameter
+# retrieval_config.add_parameter(
+#     'fsed',
+#     True,
+#     transform_prior_cube_coordinate=lambda x : 1.0 + 10.0 * x
+# )
 
 # Define opacity species to be included
 
@@ -201,7 +210,7 @@ retrieval_config.set_line_species(
         'H2O',
         '12CO',
         '13CO',
-        '12C-18O',
+        # '12C-18O',
         # '12C-17O'
         # 'H2O__POKAZATEL.R1e6',
         # 'CO-NatAbund__HITEMP.R1e6',
@@ -221,9 +230,9 @@ retrieval_config.set_line_species(
     eq = True
 )
 
-retrieval_config.add_cloud_species('Fe(s)_crystalline__DHS', eq=True, abund_lim=(-3.5, 1.0))
-retrieval_config.add_cloud_species('MgSiO3(s)_crystalline__DHS', eq=True, abund_lim=(-3.5, 1.0))
-retrieval_config.add_cloud_species('KCl(s)_crystalline__DHS', eq=True, abund_lim=(-3.5, 1.0))
+# retrieval_config.add_cloud_species('Fe(s)_crystalline__DHS', eq=True, abund_lim=(-3.5, 1.0))
+# retrieval_config.add_cloud_species('MgSiO3(s)_crystalline__DHS', eq=True, abund_lim=(-3.5, 1.0))
+# retrieval_config.add_cloud_species('KCl(s)_crystalline__DHS', eq=True, abund_lim=(-3.5, 1.0))
 
 # add isotopes as freely retrieved so we can do the ratio
 retrieval_config.add_parameter(
@@ -238,19 +247,19 @@ retrieval_config.add_parameter(
     transform_prior_cube_coordinate=lambda x : -10. + 10 * x
 )
 
-retrieval_config.add_parameter(
-    '12C-18O',
-    True,
-    transform_prior_cube_coordinate=lambda x : -10. + 10 * x
-)
+# retrieval_config.add_parameter(
+#     '12C-18O',
+#     True,
+#     transform_prior_cube_coordinate=lambda x : -10. + 10 * x
+# )
 
-for specie in retrieval_config.cloud_species:
+# for specie in retrieval_config.cloud_species:
     
-    retrieval_config.add_parameter(
-        'eq_scaling_'+specie.split('_')[0],
-        True,
-        transform_prior_cube_coordinate=lambda x : -3.5 + 4.5 * x
-    )
+#     retrieval_config.add_parameter(
+#         'eq_scaling_'+specie.split('_')[0],
+#         True,
+#         transform_prior_cube_coordinate=lambda x : -3.5 + 4.5 * x
+#     )
 
 # Before we run the retrieval, let's set up plotting.
 
@@ -264,9 +273,9 @@ retrieval_config.parameters['mass'].corner_transform = lambda x : x / cst.m_jup
 retrieval_config.parameters['log_g'].plot_in_corner = True
 # retrieval_config.parameters['log_g'].corner_ranges = [2., 5.]
 retrieval_config.parameters['log_g'].corner_label = "log g"
-retrieval_config.parameters['fsed'].plot_in_corner = True
-retrieval_config.parameters['log_kzz'].plot_in_corner = True
-retrieval_config.parameters['log_kzz'].corner_label = "log Kzz"
+# retrieval_config.parameters['fsed'].plot_in_corner = True
+# retrieval_config.parameters['log_kzz'].plot_in_corner = True
+# retrieval_config.parameters['log_kzz'].corner_label = "log Kzz"
 retrieval_config.parameters['C/O'].plot_in_corner = True
 retrieval_config.parameters['Fe/H'].plot_in_corner = True
 retrieval_config.parameters['log_pquench'].plot_in_corner = True
@@ -276,8 +285,8 @@ retrieval_config.parameters['12CO'].plot_in_corner = True
 retrieval_config.parameters['12CO'].corner_label = r"$^{12}CO$"
 retrieval_config.parameters['13CO'].plot_in_corner = True
 retrieval_config.parameters['13CO'].corner_label = r"$^{13}CO$"
-retrieval_config.parameters['12C-18O'].plot_in_corner = True
-retrieval_config.parameters['12C-18O'].corner_label = r"$C^{18}O$"
+# retrieval_config.parameters['12C-18O'].plot_in_corner = True
+# retrieval_config.parameters['12C-18O'].corner_label = r"$C^{18}O$"
 
 retrieval_config.parameters['NIRSPEC_G395H_HPF_radvel'].plot_in_corner = True
 retrieval_config.parameters['NIRSPEC_G395H_HPF_radvel'].corner_label = "RV_bd"
@@ -288,10 +297,10 @@ retrieval_config.parameters['NIRSPEC_G395H_HPF_R_slope'].corner_label = "$R$ slo
 retrieval_config.parameters['NIRSPEC_G395H_HPF_R_int'].plot_in_corner = True
 retrieval_config.parameters['NIRSPEC_G395H_HPF_R_int'].corner_label = "$R$ int"
 
-for spec in retrieval_config.cloud_species:
-    cname = spec.split('_')[0]
-    retrieval_config.parameters['eq_scaling_' + cname].plot_in_corner = True
-    retrieval_config.parameters['eq_scaling_' + cname].corner_label = cname
+# for spec in retrieval_config.cloud_species:
+#     cname = spec.split('_')[0]
+#     retrieval_config.parameters['eq_scaling_' + cname].plot_in_corner = True
+#     retrieval_config.parameters['eq_scaling_' + cname].corner_label = cname
 
 # Define axis properties of spectral plot if run_mode == 'evaluate'
 retrieval_config.plot_kwargs["spec_xlabel"] = 'Wavelength [micron]'
