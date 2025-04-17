@@ -36,8 +36,8 @@ and changes on wbalmer's fork, and the "hpf_nirspec_data" branch, https://github
 
 1) create a new virtual env with conda: `conda create -n prt3 python=3.11`
 2) install chromium via conda: `conda install esss::chromium`
-3) pip is installed when python=3.11 was specified in the conda create, so we can install prt3 prerequisities with pip: `pip install numpy meson-python ninja`
-4) because mpi is already on rockfish, we need to avoid trying to install it via conda and instead install mpi4py in our home dir, so that the paths all work out. so `cd ~/mpi4py-3.1.5` and `pip install .` and then `cd ~`
+3) pip is installed when python=3.11 was specified in the conda create, so we can install prt3 prerequisities with pip: `pip install numpy cython meson-python ninja`
+4) because mpi is already on rockfish, we need to avoid trying to install it via conda and instead install mpi4py via pip, either `pip install mpi4py` (or, as was previously necessary, using the downloaded version in our home dir, so that the paths all work out. so `cd ~/mpi4py-3.1.5` and `pip install .` and then `cd ~`)
 5) clone fork from git `git clone https://github.com/wbalmer/petitRADTRANS.git` and `git checkout hpf_nirspec_data`
 6) install prt3 using pip `pip install -e .[retrieval] --no-build-isolation`
 7) install species and therefore spectres via pip : `pip install species`
