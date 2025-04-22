@@ -61,3 +61,16 @@ and changes on wbalmer's fork, and the "hpf_nirspec_data" branch, https://github
    make
    ```
 10) then, you can run e.g. `mpiexec -n 16 python prt_retrieval_test_interp_manyiso.py`
+
+
+On the petitradtrans/retrieval/retrieval.py, I edited lines 4128 to be
+
+try:
+   flength = len(flux)
+except TypeError:
+   wavelengths = np.array([wavelengths])
+   flux = np.array([flux])
+   error = np.array([error])
+   wavelengths_bins = np.array([wavelengths_bins])
+
+and 4334 to wavelength_bins
